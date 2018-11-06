@@ -67,12 +67,12 @@ struct seg {
             if(l & 1) apply(l++, delta);
             if(r & 1) apply(--r, delta);
         }
-        build(l0); build(r0 - 1);
+        build(l0); build(r0 - 1); 
     }
 
     int query(int l, int r) {
         l += N, r += N;
-        push(l); push(r);
+        push(l); push(l + 1); push(r - 1); push(r);
         int res = 0;
         for(; l < r; l >>= 1, r >>= 1) {
             if(l & 1) res = combine(res, Tree[l++]);
@@ -95,7 +95,9 @@ struct seg {
         
         //printf("Tamanho da maior vela viva no intervalo [%d, %d) = %d \n", 0, candleHeight, res);
         if( res == 0) return false; 
-
+        
+        push(candleHeight - 1);
+    
         int pointVal = Tree[N + candleHeight - 1];
         if(pointVal == 0) return false;
 
@@ -106,7 +108,6 @@ struct seg {
         
         int takenCareOf = firstLeft;
         if(takenCareOf > 0) update(0, firstLeft, 1);
-
         //printf("firstLeft = %d, firstRight = %d\n", firstLeft, firstRight);
         int rem = candleHeight - takenCareOf;
      
@@ -126,6 +127,7 @@ struct seg {
         int lo = 0, hi = upperBound;
         while(lo < hi) {
             int mid = lo + (hi - lo) / 2;
+            push(mid);
             if( Tree[mid + N] == wantedValue) hi = mid;
             else lo = mid + 1;
         }
@@ -138,6 +140,7 @@ struct seg {
         
         while(lo < hi) {
             int mid = lo + (hi - lo + 1) / 2;
+            push(mid);
             if( Tree[mid + N] == wantedValue) lo = mid;
             else hi = mid - 1;
         }

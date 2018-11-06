@@ -18,10 +18,9 @@ int main()
     for(int i = 0; i < (int) s.size(); ++i)  
     {
         char c = s[i];
-        long long prev = res[c - 'a'];
-        res[c - 'a'] = (1 + soma) % mod;
-        soma += res[c - 'a'] - prev;
-        soma %= mod;
+        res[c - 'a'] = (1ll + soma) % mod;
+        soma = 0;
+        for(int j = 0; j < k; ++j) soma = ( soma + res[j]) % mod;
         seen[c - 'a'] = i;
     }
     for(int i = 0; i < n; ++i) 
@@ -36,11 +35,10 @@ int main()
                 idx = j;
             } 
         }
-        long long prev = res[ idx ];
-        res[ idx ] = ( 1 + soma ) % mod;
-        soma += ( res[idx] - prev );
+        res[ idx ] = ( 1ll + soma ) % mod;
+        soma = 0;
+        for(int j = 0; j < k; ++j) soma = (soma + res[j] ) % mod;
         seen[idx] = i + (int) s.size();
-        soma %= mod;
     }
     cout << (soma + 1) % mod << endl;
     return 0;
