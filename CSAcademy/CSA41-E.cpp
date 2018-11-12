@@ -3,34 +3,35 @@
 
 using namespace std;
 
-using vi = vector<int>;
-
 int n, m;
-vi h, c;
+vector<int> candleHeights, dailyDemand;
 
 bool f(int v)
 {
-    vector< int > candles(v);
+    vector< int > demands(v);
     long long maxFlow = 0;
+    
     for(int i = 0; i < v; ++i)
     {
-        candles[i] = c[i];
-        maxFlow += c[i];
+        demands[i] = dailyDemand[i];
+        maxFlow += dailyDemand[i];
     }
-    sort( all(candles ) );
-    
+    sort( all( demands ) );
+   
+
     int leftIdx = 0;
+    
     array<long long, 2> s = { 0, maxFlow };
+    
     long long minC = maxFlow;
 
     for(int i = v - 1; i >= 0; --i)
     {
-        // Removing edge from candle[i] -> superSink, from the cut
-        s[1] -= candles[i]; 
+        s[1] -= demands[i]; 
     
-        while( leftIdx < n && h[leftIdx] < v - i)
+        while( leftIdx < n && candleHeights[leftIdx] < v - i)
         {
-            s[0] += h[leftIdx++]; // adding adge superSource -> h[idx], to the cut
+            s[0] += candleHeights[leftIdx++];
         }
         
         minC = min( minC, 0LL + s[0] + s[1] + 1LL * ( v - i ) * ( n - leftIdx) ); 
@@ -44,10 +45,13 @@ int main()
     ios::sync_with_stdio(0);
     cin.tie(0);
     cin >> n >> m;
-    h.resize(n); c.resize(m);
-    for(int& x : h) cin >> x;
-    for(int& x : c) cin >> x;
-    sort(all(h) );
+    candleHeights.resize(n); 
+    dailyDemand.resize(m);
+    
+    for(int& x : candleHeights) cin >> x;
+    for(int& x : dailyDemand) cin >> x;
+    
+    sort(all( candleHeights ) );
     
     int lo = 0, hi = m;
     while(lo < hi)
@@ -57,7 +61,7 @@ int main()
         else hi = mid - 1;
     }
     cout << lo << endl;
+    
     return 0;
-
 
 }
