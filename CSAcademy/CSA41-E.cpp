@@ -34,7 +34,7 @@ bool f(int v)
         maxFlow += dailyDemand[i];
     }
     
-    // We will be sorting the demands to try to increase the cut in a greedy way
+    // We will be sorting the demands to try to improve the cut in a greedy way
     sort( all( demands ) );
     
     /* 
