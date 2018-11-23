@@ -2,89 +2,48 @@
 
 using namespace std;
 
-#define pb push_back
-#define mp make_pair
-#define fi first
-#define se second
-#define all(v) (v).begin(), (v).end()
-#define rep(i,a,b) for(int (i) = (a); (i) < (b); ++(i))
-#define repit(i, x) for( auto (i) = begin(x); i != end(x); ++i)
-#define buff() ios::sync_with_stdio(0);cin.tie(0)
-#define sz(x) ( (int) (x).size() )
-
-using vi  = vector<int>;
-using ll  = long long;
-using pii = pair<int, int>;
-using vll = vector<ll>;
-using pll = pair<ll, ll>;
-using ld  = long double;
-
+constexpr int ms  = 3 * 1e5 + 13;
 constexpr int inf = 0x3f3f3f3f;
 
-inline ll powmod(ll a, ll b) 
+int dp[ms][2];
+int day[ms][2];
+int n, k;
+inline void remin(int& a, const int b) { a = min(a, b); }
+
+int doit(const int pa, const int pb, const int a, const int b)
 {
-    ll res = 1; a %= mod; assert(b >= 0);
-    for(;b;b>>=1) 
+    int res = inf;
+    if(pa <= k)
     {
-        if(b&1) res = (res * a) % mod;
-        a = (a*a) % mod;
+        int cnt = (pa + a + k - 1) / k - 1;
+        if(b == cnt) remin( res , pa + a - cnt * k);
+    }
+    if(pb <= k)
+    {
+        int cnt = (a + k - 1) / k - 1;
+        if(b == cnt) remin( res , a - cnt * k);
+        else if(b > cnt && b <= 1LL * (a - 1LL) * 1LL * k + 1LL * (k - pb) ) remin( res, 1);
     }
     return res;
-}
-constexpr int ms = 3 * 1e5 + 13;
+};
 
-int dp[ms][2], days[ms][2];
 
-int main() 
+
+int main()
 {
-    buff();
-    int n, k;
+    ios::sync_with_stdio(0); cin.tie(0);
     cin >> n >> k;
-    for(int i = 1; i <= n; ++i) cin >> days[i][0];
-    for(int i = 1; i <= n; ++i) cin >> days[i][1];
+    for(int i = 0; i < n; ++i) cin >> day[i + 1][0];
+    for(int i = 0; i < n; ++i) cin >> day[i + 1][1];
     
-    auto check = [&] (int day, int ans, int digit)
-    {
-        if( ans > days[day][value]) return false;
-        int good[2];
-        good[0] = days[day][0];
-        good[1] = days[day][1];
-        good[ digit ] -= ans;
-        
-        if(good[0] == inf || good[1] == inf) return false;
-        
-        bool ok = false;
-        for(int initialDigit = 0; initialDigit < 2; ++initialDigit)
-        {
-            for(int previousEnd = 0; previousEnd < 2; ++previousEnd)
-            {
-                if(initialDigit == previousEnd)
-                {
-                    
-                }
-                else
-                {
-
-                }
-            }
-        }
-
-    };
-
     for(int i = 1; i <= n; ++i)
     {
-        for(int val = 0; val < 2; ++val)
-        {
-            int lo = 1, hi = days[i][val];
-            while(lo < hi)
-            {
-                int mid = (lo + hi) / 2;
-                
-            }
-        }
+        dp[i][0] = dp[i][1] = inf;
+        dp[i][0] = doit( dp[i - 1][0], dp[i - 1][1], day[i - 1][0], day[i - 1][1] );
+        dp[i][1] = doit( dp[i - 1][1], dp[i - 1][0], day[i - 1][1], day[i - 1][0] );
+        cout << dp[i][0] << " " << dp[i][1] << endl;
     }
-
-
-
+    remin( dp[n][0], dp[n][1]);
+    cout << ( dp[n][0] <= k ? "YES" : "NO" ) << endl;
+    return 0;
 }
-
