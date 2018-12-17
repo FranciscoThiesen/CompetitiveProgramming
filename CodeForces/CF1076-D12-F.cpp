@@ -2,48 +2,50 @@
 
 using namespace std;
 
-constexpr int ms  = 3 * 1e5 + 13;
-constexpr int inf = 0x3f3f3f3f;
+typedef long long ll;
+
+constexpr int ms = 3 * 1e5 + 13;
+constexpr int inf = 1e9;
 
 int dp[ms][2];
-int day[ms][2];
+
 int n, k;
-inline void remin(int& a, const int b) { a = min(a, b); }
+int a[ms], b[ms];
 
-int doit(const int pa, const int pb, const int a, const int b)
+inline int doit(int pa, int pb, int a, int b)
 {
-    int res = inf;
-    if(pa <= k)
+	int ans = inf;
+	if (pa <= k)
     {
-        int cnt = (pa + a + k - 1) / k - 1;
-        if(b == cnt) remin( res , pa + a - cnt * k);
-    }
-    if(pb <= k)
+		int tot = pa + a;
+		int cnt = (tot + k - 1) / k - 1;
+		if (b == cnt) ans = min(ans, tot - cnt * k);
+		else if (b > cnt && b <= a * ll(k)) ans = min(ans, 1);
+	}
+	if (pb <= k)
     {
-        int cnt = (a + k - 1) / k - 1;
-        if(b == cnt) remin( res , a - cnt * k);
-        else if(b > cnt && b <= 1LL * (a - 1LL) * 1LL * k + 1LL * (k - pb) ) remin( res, 1);
-    }
-    return res;
-};
+		int cnt = (a + k - 1) / k - 1;
+		if (b == cnt) ans = min(ans, a - cnt * k);
+		else if (b > cnt && b <= (a - 1) * ll(k) + (k - pb)) ans = min(ans, 1);
+	}
+	return ans;
+}
 
-
-
-int main()
+int main() 
 {
-    ios::sync_with_stdio(0); cin.tie(0);
+    ios::sync_with_stdio(0);
+    cin.tie(NULL);
     cin >> n >> k;
-    for(int i = 0; i < n; ++i) cin >> day[i + 1][0];
-    for(int i = 0; i < n; ++i) cin >> day[i + 1][1];
-    
-    for(int i = 1; i <= n; ++i)
+    for(int i = 0; i < n; ++i) cin >> a[i];
+    for(int i = 0; i < n; ++i) cin >> b[i];
+    for(int i = 0; i < ms; ++i) for(int j = 0; j < 2; ++j) dp[i][j] = inf;
+	dp[0][0] = dp[0][1] = 0;
+	for(int i = 0; i < n; ++i)
     {
-        dp[i][0] = dp[i][1] = inf;
-        dp[i][0] = doit( dp[i - 1][0], dp[i - 1][1], day[i - 1][0], day[i - 1][1] );
-        dp[i][1] = doit( dp[i - 1][1], dp[i - 1][0], day[i - 1][1], day[i - 1][0] );
-        cout << dp[i][0] << " " << dp[i][1] << endl;
-    }
-    remin( dp[n][0], dp[n][1]);
-    cout << ( dp[n][0] <= k ? "YES" : "NO" ) << endl;
-    return 0;
+		dp[i + 1][0] = doit(dp[i][0], dp[i][1], a[i], b[i]);
+		dp[i + 1][1] = doit(dp[i][1], dp[i][0], b[i], a[i]);
+	}
+    if( dp[n][0] <= k || dp[n][1] <= k) cout << "YES" << endl;
+    else cout << "NO" << endl;
+	return 0;
 }
