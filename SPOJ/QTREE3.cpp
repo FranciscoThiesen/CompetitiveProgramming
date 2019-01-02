@@ -31,6 +31,7 @@ ll mod(ll a, ll b) {
 int cmp(double x, double y = 0, double tol = 1.e-7) {
     return (x <= y + tol) ? (x + tol < y) ? -1 : 0 : 1;
 }
+
 template<typename T> struct seg_tree {
   int S;
  
@@ -67,6 +68,7 @@ template<typename T> struct seg_tree {
     return res_left * res_right;
   }
 };
+
 struct lca {
   int L, N;
   vector<int> depth, size, link;
@@ -133,7 +135,7 @@ template<typename T> struct heavy_light {
       return links.size[i] > links.size[j]; });
     if (loc != par) ch.erase(ch.begin());
  
-    for (int c = 0; c < ch.size(); c++)
+    for (int c = 0; c < (int) ch.size(); c++)
       dfs(ch[c], loc, c ? ch[c] : lhv, graph);
   }
   void upd(int loc, T value) {
@@ -161,52 +163,45 @@ template<typename T> struct heavy_light {
 // Beginning of actual code, above you have the concatenation of template.cpp, data_structures/segtree.cpp, heavy_light/lca.cpp, and heavy_light/heavy_light.cpp
  
 struct T {
-    ll x;
-    T(ll x = LLONG_MIN) : x(x) {}
+    int x;
+    T(int x = -1) : x(x) {}
  
     T operator*(T rhs) const {
-        return max(x, rhs.x);
+        if( x == -1) return rhs.x;
+        return x;
     }
 };
  
 void doit() {
-    int N;
-    scanf("%d", &N);
-    vvi graph(N + (N - 1)); // first N represent nodes, last N-1 represent arcs
-    vi costs(N - 1);
+    int N, Q;
+    scanf("%d %d", &N, &Q);
+    vvi graph(N); // first N represent nodes, last N-1 represent arcs
+    vi color(N, 0);
     fu(i, N - 1) {
-        int a, b, c;
-        scanf("%d %d %d", &a, &b, &c); a--; b--;
-        graph[a].push_back(N + i);
-        graph[b].push_back(N + i);
-        graph[N+i].push_back(a);
-        graph[N+i].push_back(b);
-        costs[i] = c;
+        int a, b;
+        scanf("%d %d", &a, &b); a--; b--;
+        graph[a].push_back(b);
+        graph[b].push_back(a);
     }
     heavy_light<T> hld(graph, 0);
     // insert the cost of edges
-    fu(i, N-1) hld.upd(N + i, T(costs[i]));
+    //fu(i, N-1) hld.upd(N + i, T(costs[i]));
     // process queries
-    while (true) {
-        char command[50];
-        scanf(" %s", command);
-        if (command[0] == 'D') break;
-        else if (command[0] == 'Q') {
-            int a, b;
-            scanf("%d %d", &a, &b);
-            printf("%lld\n", hld.query(a - 1, b - 1).x);
+    fu(i, Q) {        
+        int t, u;
+        scanf("%d %d", &t, &u);
+        --u;
+        if (t == 1) {
+            printf("%d\n", hld.query(0, u).x);
         } else {
-            int i;
-            ll ti;
-            scanf("%d %lld", &i, &ti);
-            hld.upd(N + i - 1, ti);
+            color[u] ^= 1;
+            if( color[u] == 1 ) hld.upd(u, u + 1);
+            else hld.upd(u, -1LL);
         }
     }
 }
  
 int main() {
-    int t;
-    scanf("%d", &t);
-    while (t--) doit();
+    doit();
     return 0;
 }
