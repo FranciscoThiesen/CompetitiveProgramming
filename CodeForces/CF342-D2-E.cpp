@@ -35,7 +35,7 @@ struct centroid_decomposition {
         for(int i = 0; i < N; ++i) reverse_mapping[ node_mapping[i] ] = i;
     }
    
-    inline void dfs(int loc, int par, const vvi& graph ) {
+    void dfs(int loc, int par, const vvi& graph ) {
         if( node_mapping[loc] != -1) return;
         for(const int& nxt : graph[loc] ) {
             if( node_mapping[nxt] == -1 && nxt != par) {
@@ -47,7 +47,7 @@ struct centroid_decomposition {
         subtree_size[loc] += 1;
     }
     
-    inline int find_centroid( int loc, int par, int subtree_node_count, const vvi& graph) {
+    int find_centroid( int loc, int par, int subtree_node_count, const vvi& graph) {
         int largest_size = -1, largest_kid = loc;
         for(const int& nxt : graph[loc] ) {
             if( nxt != par ) {
@@ -70,7 +70,7 @@ struct centroid_decomposition {
         return find_centroid(largest_kid, loc, subtree_node_count, graph);
     }
 
-    inline void decompose(int loc, const int par, const vvi& graph) {
+    void decompose(int loc, const int par, const vvi& graph) {
         fill(all(subtree_size), 0);
         dfs( loc, -1, graph );
         int C = find_centroid(loc, -1, subtree_size[loc], graph); 
@@ -100,7 +100,7 @@ struct lca {
     link.resize(L*N);
     init(root, root, graph);
   }
-  inline void init(int loc, int par, const vvi &graph) {
+  void init(int loc, int par, const vvi &graph) {
     link[loc] = par;
     for (int l = 1; l < L; l++)
       link[l*N + loc] = link[(l-1)*N + link[(l-1)*N + loc]];
@@ -119,7 +119,7 @@ struct lca {
     return loc;
   }
 
-  inline int find(int u, int v) {
+  int find(int u, int v) {
     if (depth[u] > depth[v]) swap(u, v);
     v = above(v, depth[v] - depth[u]);
     if (u == v) return u;
@@ -138,13 +138,11 @@ inline int calculate_distance(int u, int v, lca& memo) {
     return (memo.depth[u] + memo.depth[v] - 2 * memo.depth[LCA] );
 }
 
-
-int ancDist[100010][17];
-
 int main()
 {
-    int n;
-    scanf("%d", &n);
+    int n, q;
+    
+    scanf("%d %d", &n, &q); 
     vvi g(n);
     
     for(int i = 0; i < n - 1; ++i) {
@@ -161,16 +159,13 @@ int main()
     
     deque<bool> color(n, 0);
     
-    vector< multiset<int> > doit(n);
-
-    int q;
-    scanf("%d", &q);
+    vector<pair<int, int> > closest(n, pair<int, int>(-1, inf) );
     
     int LGMAX;
+    
     for(LGMAX = 0; (1 << LGMAX) <= n; ++LGMAX);
    
-    //vvi ancDist(n, vi(LGMAX, -1) );
-    memset(ancDist, -1, sizeof ancDist );
+    vvi ancDist(n, vi(LGMAX, -1) );
 
     // Encontrando as distancias de um no e seus ancestrais da decomposicao, na arvore original
     for(int i = 0; i < n; ++i) {
@@ -185,38 +180,59 @@ int main()
             ++lvl;
         }
     }
-
+    
+    // Node 0 is already colored at the beginning
+    int x = xablau.node_mapping[0];
+    color[x] = 1;
+    int lvl = 0, current = x;
+    while( current != -1) {
+        int bestCurr = closest[current].second;
+        if( ancDist[x][lvl] < bestCurr ) {
+            bestCurr = ancDist[x][lvl];
+            closest[current] = make_pair( xablau.reverse_mapping[x] + 1, ancDist[x][lvl]);
+        }
+        ++lvl;
+        current = xablau.father[current];
+    }
+    // End insertion of node 0
+    //
+    
     while( q-- ) {
         int t, x;
         scanf("%d %d", &t, &x);
         --x;
         x = xablau.node_mapping[x];
-        if(t == 0) {
-            color[x] ^= 1;
+        if(t == 1) {
+            color[x] = 1;
             int lvl = 0;
             int current = x;
             while( current != -1) {
-                if( color[x] ) doit[current].insert( ancDist[x][lvl] );
-                else doit[current].erase( doit[current].find(ancDist[x][lvl]) );
+                int bestCurrent = closest[current].second;
+                if( ancDist[x][lvl] < bestCurrent ) {
+                    closest[current] = make_pair( xablau.reverse_mapping[x] + 1, ancDist[x][lvl]);
+                    bestCurrent = ancDist[x][lvl];
+                }
                 current = xablau.father[current];
                 ++lvl;
             }
         } 
         else {
             // hora do show porra
-            int best = inf;
+            int best = closest[x].second;
             int current = x; 
             int lvl = 0;
             while( current != -1) {
-                if( !doit[current].empty() ) {
-                    int top = *(doit[current].begin());
+                if( closest[current].first != -1) {
+                    int top = closest[current].second;
                     int inc = ancDist[x][lvl];
-                    best = min( best, top + inc);
+                    if( top + inc < best) {
+                        best = top + inc;
+                    } 
                 }
                 ++lvl;
                 current = xablau.father[current];
             }
-            printf("%d\n", ( best >= inf) ? -1 : best );
+            printf("%d\n", best);
         }
     }
     return 0;
