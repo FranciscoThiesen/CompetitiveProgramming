@@ -42,18 +42,47 @@ int main() {
     ios::sync_with_stdio(0);cin.tie(NULL);
     int n;
     cin >> n;
-    vector<long long> v(n);
-    for(auto& x : v) cin >> x;
-    sort( rall(v) );
-    long long soma = 0;
-    for(auto& x : v) soma += x;
-    int m;
-    cin >> m;
-    for(int i = 0; i < m; ++i) {
-        int x;
-        cin >> x;
-        cout << soma - v[x - 1] << endl;
+    vector< pair<int, int> > arr;
+    vector< pair<int, int> > fuck;
+    rep(i, 0, n) {
+        int a, b;
+        cin >> a >> b;
+        fuck.emplace_back(a, b);
+        arr.emplace_back(a, 0);
+        arr.emplace_back(b, 1);
     }
+    sort( all(arr) );
+    int ans = 0;
+    int last_turned = 0;
+    // try all-values
+    int lo = 0, hi = 40000;
+    while( lo < hi ) {
+        int mid = (lo + hi) / 2;
+        vector<int> freq(40001, 0);
+        vector<int> occ(40001, 0);
+        for(const auto& v : fuck) {
+            occ[v.first]++;
+            occ[v.second]--;
+            freq[v.first]++;
+            if( v.first + mid <= 40000 ) freq[v.first + mid]--;
+        }
+        for(int i = 1; i < 40001; ++i) {
+            freq[i] += freq[i - 1];
+            occ[i] += occ[i - 1];
+        }
+        
+        bool good = true;
+        for(int i = 0; i < 40001; ++i) {
+            if(occ[i] > 0 && freq[i] == 0) {
+                good = false;
+                break;
+            }
+        }
+        if( good ) hi = mid;
+        else lo = mid + 1;
+    }
+
+    cout << lo << endl;
     return 0;
 }
 

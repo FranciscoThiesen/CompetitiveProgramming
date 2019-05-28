@@ -42,18 +42,32 @@ int main() {
     ios::sync_with_stdio(0);cin.tie(NULL);
     int n;
     cin >> n;
-    vector<long long> v(n);
-    for(auto& x : v) cin >> x;
-    sort( rall(v) );
-    long long soma = 0;
-    for(auto& x : v) soma += x;
-    int m;
-    cin >> m;
-    for(int i = 0; i < m; ++i) {
-        int x;
-        cin >> x;
-        cout << soma - v[x - 1] << endl;
+    vector< tuple<int, int, int> > boxes;
+    rep(i,0,n) {
+        int a, b, c;
+        cin >> a >> b >> c;
+        vector<int> v = {a, b, c};
+        sort(all(v));
+        boxes.emplace_back(v[2],v[1],v[0]);
     }
+    sort( all(boxes), [&] (const tuple<int, int, int>& A, const tuple<int, int, int>& B) {
+        if( get<0>(A) != get<0>(B) ) return get<0>(A) < get<0>(B);
+        if( get<1>(A) != get<1>(B) ) return get<1>(A) < get<1>(B);
+        if( get<2>(A) != get<2>(B) ) return get<2>(B) < get<2>(B);
+    });
+    auto fit = [&] (const tuple<int, int, int>& A, const tuple<int, int, int>& B) {
+        int xA = get<0>(A), yA = get<1>(A), zA = get<2>(A);
+        int xB = get<0>(B), yB = get<1>(B), zB = get<2>(B);
+        return ( (xA < xB && yA < yB) && zA < zB ) ? true : false;
+    };
+    for(int i = 1; i < n; ++i) {
+        if( fit(boxes[i - 1], boxes[i] ) == false ) {
+            cout << "N" << endl;
+            return 0;
+        } 
+    }
+    cout << "S" << endl;
+
     return 0;
 }
 

@@ -38,22 +38,18 @@ inline ll powmod( ll a, ll b, ll mod = MOD) {
 
 mt19937 rng(chrono::steady_clock::now().time_since_epoch().count());
 
-int main() {
+int test_case(int n, int lucky)
+{
+    // let's say max answer = 2000
+    vector<ll> mod_pow(2001, 0);
+
+}
+
+
+int main() 
+{
     ios::sync_with_stdio(0);cin.tie(NULL);
-    int n;
-    cin >> n;
-    vector<long long> v(n);
-    for(auto& x : v) cin >> x;
-    sort( rall(v) );
-    long long soma = 0;
-    for(auto& x : v) soma += x;
-    int m;
-    cin >> m;
-    for(int i = 0; i < m; ++i) {
-        int x;
-        cin >> x;
-        cout << soma - v[x - 1] << endl;
-    }
+        
     return 0;
 }
 

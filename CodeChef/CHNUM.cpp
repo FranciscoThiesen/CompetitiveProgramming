@@ -40,19 +40,28 @@ mt19937 rng(chrono::steady_clock::now().time_since_epoch().count());
 
 int main() {
     ios::sync_with_stdio(0);cin.tie(NULL);
-    int n;
-    cin >> n;
-    vector<long long> v(n);
-    for(auto& x : v) cin >> x;
-    sort( rall(v) );
-    long long soma = 0;
-    for(auto& x : v) soma += x;
-    int m;
-    cin >> m;
-    for(int i = 0; i < m; ++i) {
+    int t;
+    cin >> t;
+    while( t-- ) {
         int x;
         cin >> x;
-        cout << soma - v[x - 1] << endl;
+        vector<int> v(x);
+        for(int& _ : v) cin >> _;
+        array<int, 3> count = {0, 0, 0};
+        for(const auto& e : v) {
+            if( e < 0 ) count[0]++;
+            else if( e == 0) count[1]++;
+            else count[2]++;
+        }
+        cout << max( count[2], count[0] ) + count[1] << " ";
+        int t2 = max( count[2], max( count[1], count[0] ) );
+        if( count[1] ) t2 = 1;
+        for(int i = 0; i < 3; ++i) {
+            if( count[i] ) {
+                t2 = min(t2, count[i]);
+            }
+        }
+        cout << t2 << endl;
     }
     return 0;
 }

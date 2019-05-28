@@ -2,7 +2,7 @@
 
 using namespace std;
 
-constexpr int ms = 505;
+constexpr int ms = 5050;
 constexpr int inf = 0x3f3f3f3f;
 
 int dp[ms][ms][2];
@@ -63,15 +63,11 @@ int main()
                 	dp[st][nd][0] = min( dp[st][nd][0], dp[st + 1][nd][1] + 1);
                 	dp[st][nd][0] = min( dp[st][nd][0], dp[st][nd - 1][0] + 1);
                 	dp[st][nd][0] = min( dp[st][nd][0], dp[st][nd - 1][1] + 1);
-                    dp[st][nd][0] = min( dp[st][nd][0], dp[st + 1][nd - 1][0] + 2);
-                	dp[st][nd][0] = min( dp[st][nd][0], dp[st + 1][nd - 1][1] + 2);
 
                 	dp[st][nd][1] = min( dp[st][nd][1], dp[st + 1][nd][0] + 1);
                 	dp[st][nd][1] = min( dp[st][nd][1], dp[st + 1][nd][1] + 1);
                 	dp[st][nd][1] = min( dp[st][nd][1], dp[st][nd - 1][0] + 1);
                 	dp[st][nd][1] = min( dp[st][nd][1], dp[st][nd - 1][1] + 1);
-                    dp[st][nd][1] = min( dp[st][nd][1], dp[st + 1][nd - 1][0] + 2);
-                	dp[st][nd][1] = min( dp[st][nd][1], dp[st + 1][nd - 1][1] + 2);
 
                 }
             }

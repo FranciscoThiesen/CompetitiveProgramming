@@ -1,65 +1,127 @@
 #include <bits/stdc++.h>
-#include <ext/pb_ds/assoc_container.hpp>
-#include <ext/pb_ds/tree_policy.hpp>
 
-using namespace __gnu_pbds;
 using namespace std;
 
-#define TRACE(x) x
-#define WATCH(x) TRACE( cout << #x" = " << x << endl)
-#define PRINT(x) TRACE(printf(x))
-#define WATCHR(a, b) TRACE( for(auto c = a; c != b;) cout << *(c++) << " "; cout << endl)
-#define WATCHC(V) TRACE({cout << #V" = "; WATCHR(V.begin(), V.end()); } )
-#define all(v) (v).begin(), (v).end()
-#define rall(v) (v).rbegin(), (v).rend()
-#define sz(v) (int) (v).size()
-#define rep(i,a,b) for(int (i) = (a); (i) < (b); ++(i))
-#define pb push_back
-#define mp make_pair
-#define fi first
-#define se second
-#define funoredered_map __fast_unordered_map
-
-template<class Key, class Value, class Hash = std::hash<Key>>
-using funordered_map = __gnu_pbds::gp_hash_table<Key, Value, Hash>;
-using ll = long long;
-using vi = vector<int>;
-using vll = vector<ll>;
-using pii = pair<int, int>;
-using pll = pair<ll, ll>;
-
+constexpr int ms = 5050;
 constexpr int inf = 0x3f3f3f3f;
-constexpr double EPS = 1e-8;
-constexpr ll  MOD = 1000000007LL;
 
-template <typename T>
-using ordered_set = 
-    tree<T, null_type, less<T>, rb_tree_tag, tree_order_statistics_node_update>;
-
-// online for debugging pairs with modern cpp ( >= 17 )
-/*ostream &operator<<(ostream& os, const pair<auto, auto>& p) {
-    return os << "(" << p.first << "," << p.second << ")";
-}*/
-
-inline ll powmod( ll a, ll b, ll mod = MOD) {
-    ll res = 1; a %= mod; assert(b >= 0);
-    for(;b;b>>=1) {
-        if(b&1) res = (res * a) % mod;
-        a = (a * a) % mod;
-    }
-    return res;
-}
-
-inline int cmp_double( double x, double y, double tol = EPS) {
-    return (x <= y + tol) ? ( x + tol < y) ? -1 : 0 : 1;
-}
-
-mt19937 rng(chrono::steady_clock::now().time_since_epoch().count());
+int dp[ms][ms][2];
+vector< int > cc;
+int len;
 
 int main()
 {
-    ios::sync_with_stdio(0);cin.tie(NULL);
+    ios::sync_with_stdio( false ); cin.tie(NULL);
+    int n;
+    cin >> n;
     
-    return 0;
-}
+    vector<int> c(n);
+    for(int& x : c) cin >> x;
 
+    int cur = c[0];
+    
+    for(int i = 1; i < n; ++i) 
+    {
+        if( c[i] != c[i - 1] ) 
+        {
+            cc.emplace_back(cur);
+            cur = c[i];
+        } 
+    }
+    cc.emplace_back( cur );
+
+    len = (int) cc.size();
+
+    for(int l = 1; l <= len; ++l) 
+    {
+        for(int st = 0; st + l - 1 < len; ++st)
+        {
+            int nd = st + l - 1;
+            dp[st][nd][0] = dp[st][nd][1] = inf;
+            if( st == nd ) dp[st][nd][0] = dp[st][nd][1] = 0;
+            else if( st == nd - 1) 
+            {
+                dp[st][nd][0] = dp[st][nd][1] = 1;
+            }
+            else
+            {
+                // b == 0
+                if( cc[st] == cc[nd] ) 
+                {
+                    if( cc[st] == cc[st + 1] ) 
+                    {
+                        dp[st][nd][0] = min( dp[st][nd][0], dp[st + 1][nd - 1][0] ); 
+                    }
+                    if( cc[st] == cc[nd - 1] ) 
+                    {
+                        dp[st][nd][0] = min( dp[st][nd][0], dp[st + 1][nd - 1][1] );
+                    }
+                    dp[st][nd][0] = min( dp[st][nd][0], dp[st + 1][nd - 1][0] + 1);
+                    dp[st][nd][0] = min( dp[st][nd][0], dp[st + 1][nd - 1][1] + 1);
+                }
+                else
+                {
+                    if( cc[st] == cc[st + 1] ) 
+                    {
+                        dp[st][nd][0] = min( dp[st + 1][nd][0], dp[st][nd][0] );
+                    }
+                    if( cc[st] == cc[nd - 1] )
+                    {
+                        dp[st][nd][0] = min( dp[st][nd - 1][1] + 1, dp[st][nd][0] );
+                    }
+                }
+                
+                dp[st][nd][0] = min( dp[st + 1][nd][1] + 1, dp[st][nd][0]);
+                dp[st][nd][0] = min( dp[st + 1][nd][0] + 1, dp[st][nd][0]);
+                dp[st][nd][0] = min( dp[st][nd][0], dp[st][nd - 1][0] + 1);
+                dp[st][nd][0] = min( dp[st][nd][0], dp[st][nd - 1][1] + 1); // thats all folks for b == 0
+            
+                // b == 1
+                if( cc[st] == cc[nd] )
+                {
+                    if( cc[nd] == cc[st + 1] )
+                    {
+                        dp[st][nd][1] = min( dp[st][nd][1], dp[st + 1][nd - 1][0] );
+                    }
+                    if( cc[nd] == cc[nd - 1] ) 
+                    {
+                        dp[st][nd][1] = min( dp[st][nd][1], dp[st + 1][nd - 1][1] );
+                    }
+                    dp[st][nd][1] = min( dp[st][nd][1], dp[st + 1][nd - 1][0] + 1 );
+                    dp[st][nd][1] = min( dp[st][nd][1], dp[st + 1][nd - 1][1] + 1 );
+                }
+                else
+                {
+                    if( cc[nd] == cc[st + 1] )
+                    {
+                        dp[st][nd][1] = min( dp[st][nd][1], dp[st + 1][nd][0] + 1);
+                    }
+                    if( cc[nd] == cc[nd - 1] )
+                    {
+                        dp[st][nd][1] = min( dp[st][nd][1], dp[st][nd - 1][1] );
+                    }
+                }
+                
+                dp[st][nd][1] = min( dp[st + 1][nd][1] + 1, dp[st][nd][1]);
+                dp[st][nd][1] = min( dp[st + 1][nd][0] + 1, dp[st][nd][1]);
+                dp[st][nd][1] = min( dp[st][nd][1], dp[st][nd - 1][0] + 1);
+                dp[st][nd][1] = min( dp[st][nd][1], dp[st][nd - 1][1] + 1); // thats all folks for b == 0
+            
+            }
+        }
+    }
+    
+    /*for(int i = 0; i < len; ++i) {
+        for(int j = i; j < len; ++j) {
+            for(int b = 0; b < 2; ++b) {
+                printf("dp[%d][%d][%d] = %d  ", i, j, b, dp[i][j][b] );
+            }
+            puts("");
+        }
+        puts("\n");
+    }*/
+
+    cout << min( dp[0][len - 1][0], dp[0][len - 1][1] ) << endl;
+    return 0;
+
+}

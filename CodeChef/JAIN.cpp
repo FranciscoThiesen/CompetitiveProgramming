@@ -40,19 +40,40 @@ mt19937 rng(chrono::steady_clock::now().time_since_epoch().count());
 
 int main() {
     ios::sync_with_stdio(0);cin.tie(NULL);
-    int n;
-    cin >> n;
-    vector<long long> v(n);
-    for(auto& x : v) cin >> x;
-    sort( rall(v) );
-    long long soma = 0;
-    for(auto& x : v) soma += x;
-    int m;
-    cin >> m;
-    for(int i = 0; i < m; ++i) {
-        int x;
-        cin >> x;
-        cout << soma - v[x - 1] << endl;
+    int t;
+    cin >> t;
+    while(t--) {
+        int n;
+        cin >> n;
+        unordered_map<int, int> memo;
+        for(int i = 0; i < n; ++i) {
+            string s;
+            cin >> s;
+            int x = 0;
+            for(const char& c : s) {
+                if( c == 'a' ) x |= 1;
+                else if( c == 'e' ) x |= 2;
+                else if( c == 'i' ) x |= 4;
+                else if( c == 'o' ) x |= 8;
+                else if( c == 'u' ) x |= 16;
+            }
+            memo[x]++;
+        }
+        constexpr int MAGIC = 31;
+        long long ans = 0;
+
+        for(const auto& v : memo ) {
+            for(const auto& u : memo ) {
+                if( v.first <= u.first && (v.first | u.first ) == MAGIC ) {
+                    if( v.first == u.first ) {
+                        long long sum = ( (1LL + v.second - 1LL) * (v.second - 1) )  / 2LL;
+                        ans += sum;
+                    }
+                    else ans += 1LL * v.second * u.second; 
+                }        
+            }
+        }
+        cout << ans << endl; 
     }
     return 0;
 }

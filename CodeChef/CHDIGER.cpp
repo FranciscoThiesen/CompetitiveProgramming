@@ -38,21 +38,27 @@ inline ll powmod( ll a, ll b, ll mod = MOD) {
 
 mt19937 rng(chrono::steady_clock::now().time_since_epoch().count());
 
+void solve(long long n, char d) {
+    auto s = to_string(n);
+    int c = 0;
+    string ans;
+    for(const char& x : s ) {
+        if( x >= d ) ++c;
+        else ans += x; 
+    }
+    if(!ans.empty() ) cout << ans;
+    for(int i = 0; i < c; ++i) cout << d;
+    cout << endl;
+}
+
 int main() {
     ios::sync_with_stdio(0);cin.tie(NULL);
-    int n;
-    cin >> n;
-    vector<long long> v(n);
-    for(auto& x : v) cin >> x;
-    sort( rall(v) );
-    long long soma = 0;
-    for(auto& x : v) soma += x;
-    int m;
-    cin >> m;
-    for(int i = 0; i < m; ++i) {
-        int x;
-        cin >> x;
-        cout << soma - v[x - 1] << endl;
+    int t;
+    cin >> t;
+    while( t-- ) {
+        long long x; char d;
+        cin >> x >> d;
+        solve(x, d);
     }
     return 0;
 }
